@@ -1,11 +1,21 @@
 from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework_simplejwt.views import TokenRefreshView
+from rest_framework_simplejwt.serializers import TokenRefreshSerializer
+from rest_framework.response import Response
+from rest_framework import status
 
 
-class CookieJWTAuthentication(JWTAuthentication):
-    def authenticate(self, request):
-        access_token = request.COOKIES.get("access_token")
-        if access_token is None:
-            return None
+class CookieTokenRefreshView(TokenRefreshView):
+    def post(self, request, *args, **kwargs):
+        refresh_token = request.COOKIES.get("refresh_token")
 
-        validated_token = self.get_validated_token(access_token)
-        return self.get_user(validated_token=validated_token), validated_token
+        if not refresh_token:
+            return Response(
+                {"detail": "Refresh token not provided."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        serializer = TokenRefreshSerializer(data={"refresh": refresh_token})
+        serializer.is_valid(raise_exception=True)
+
+        return Response(serializer.validated_data)
