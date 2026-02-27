@@ -1,6 +1,6 @@
 from django.contrib.auth.models import Group, Permission
 from rest_framework import serializers
-from .permissions import PermissionSerializer
+from apps.profiles.serializers import PermissionSerializer
 
 
 class RolePermissionsSerializer(serializers.ModelSerializer):

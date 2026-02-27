@@ -1,4 +1,5 @@
-import TablePagination from "@/src/components/common/Table/TablePagination";
+
+import TablePagination from "./TablePagination";
 
 export default function TableContainer({
   children,
@@ -14,8 +15,8 @@ export default function TableContainer({
   total: number;
 }) {
   return (
-    <div className="w-full flex flex-col px-5 pb-10 pt-2">
-      <div className="border border-gray-200 transition-all duration-300 bg-white px-4">
+    <div className="w-full px-5 pb-10 pt-2">
+      <div className="border border-gray-200 transition-all duration-300 bg-white px-4 rounded-2xl">
         {children}
 
         <TablePagination

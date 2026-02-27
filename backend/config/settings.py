@@ -30,8 +30,10 @@ INSTALLED_APPS = [
     "rest_framework",
     "silk",
     "corsheaders",
+    "channels",
     # apps
     "apps.profiles",
+    "apps.notifications",
 ]
 
 MIDDLEWARE = [
@@ -125,6 +127,8 @@ REST_FRAMEWORK = {
         "rest_framework_simplejwt.authentication.JWTAuthentication",
         # "apps.utils.cookies.CookieJWTAuthentication",
     ),
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+    "PAGE_SIZE": 100,
 }
 
 
@@ -132,8 +136,8 @@ AUTH_USER_MODEL = "profiles.User"
 
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(seconds=15),
-    "REFRESH_TOKEN_LIFETIME": timedelta(seconds=30),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=15),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
 }
 
 CORS_ALLOWED_ORIGINS = [
@@ -145,3 +149,16 @@ CSRF_TRUSTED_ORIGINS = [
 ]
 
 CORS_ALLOW_CREDENTIALS = True
+ASGI_APPLICATION = "config.asgi.application"
+
+CHANNEL_LAYERS = {
+    # "default": {
+    #     "BACKEND": "channels_redis.core.RedisChannelLayer",
+    #     "CONFIG": {
+    #         "hosts": [("127.0.0.1", 6379)],
+    #     },
+    # }
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer",
+    },
+}

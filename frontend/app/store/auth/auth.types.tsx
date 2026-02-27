@@ -1,5 +1,10 @@
 export type AuthState = {
-  user: null | { id: number; name: string; email: string };
+  user: null | {
+    id: number;
+    name: string;
+    email: string;
+    access_token: string;
+  };
   isAuthenticated: boolean;
   loading: boolean;
 };

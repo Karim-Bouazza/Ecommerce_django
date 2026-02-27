@@ -1,4 +1,4 @@
-from apps.profiles.serializers.login import LoginSerializer
+from apps.profiles.serializers import LoginSerializer
 from rest_framework.views import APIView
 from django.contrib.auth import authenticate
 from rest_framework.response import Response

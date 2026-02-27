@@ -1,10 +1,14 @@
-import { getUsers } from "@/app/services/api/UsersService";
+"use client";
+
+import api from "@/app/lib/api-client";
 import { useQuery } from "@tanstack/react-query";
 
 export default function useUsers() {
-  // return useQuery(["users"], async () => {
-
-  // }
-  const users = getUsers();
-//   console.log(users);
+  return useQuery({
+    queryKey: ["users"],
+    queryFn: async () => {
+      const users = await api.get("/users/users/");
+      return users.data;
+    },
+  });
 }

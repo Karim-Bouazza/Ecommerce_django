@@ -1,6 +1,6 @@
 from apps.utils.auth_jwt import set_auth_cookies
 from rest_framework.generics import CreateAPIView
-from ..serializers import RegisterSerializer
+from ...serializers import RegisterSerializer
 from django.contrib.auth import get_user_model
 from rest_framework.permissions import AllowAny
 

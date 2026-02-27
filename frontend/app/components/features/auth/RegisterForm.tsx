@@ -15,7 +15,7 @@ import { useAuth } from "@/app/store/auth/auth.context";
 
 export function RegisterForm() {
   const [information, setInformation] = useState({
-    name: "",
+    username: "",
     email: "",
     password: "",
     password_confirmation: "",
@@ -33,7 +33,7 @@ export function RegisterForm() {
     e.preventDefault();
     try {
       const response = await authService.Register(
-        information.name,
+        information.username,
         information.email,
         information.password,
         information.password_confirmation,
@@ -55,11 +55,11 @@ export function RegisterForm() {
             <InputAuth
               mode="register"
               label="Username"
-              name="name"
+              name="username"
               type="text"
               placeholder="Votre username"
               required={true}
-              value={information.name}
+              value={information.username}
               handleInformationChange={handleInformationChange}
             />
             <InputAuth

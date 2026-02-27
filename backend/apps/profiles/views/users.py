@@ -5,7 +5,10 @@ from rest_framework.permissions import IsAuthenticated
 
 User = get_user_model()
 
+
 class UserView(ListAPIView):
     permission_classes = [IsAuthenticated]
-    queryset = User.objects.all()
+    queryset = User.objects.exclude(groups__name="client").prefetch_related("groups").only(
+        "id", "username", "first_name", "last_name", "phone"
+    )
     serializer_class = UserSerializer

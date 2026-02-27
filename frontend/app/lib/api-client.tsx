@@ -1,5 +1,7 @@
-// lib/api-client.ts
-import api from "@/src/lib/api";
+"use client";
+
+import api from "./api";
+import { tokenManager } from "./tokenManager";
 
 let isRefreshing = false;
 let failedQueue: Array<{
@@ -18,23 +20,33 @@ const processQueue = (error: any = null) => {
   failedQueue = [];
 };
 
-// Response interceptor for handling 401 errors
+api.interceptors.request.use((config) => {
+  const token = tokenManager.getToken();
+  if (token) {
+    config.headers["Authorization"] = `Bearer ${token}`;
+  }
+  return config;
+});
+
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
+    if (!error.config) {
+      return Promise.reject(error);
+    }
+
     const originalRequest = error.config;
 
-    // Skip refresh logic for auth endpoints to prevent infinite loops
-    const isAuthUrl = originalRequest.url?.includes("/api/auth/");
+    const isRefreshRequest = originalRequest.url?.includes(
+      "/api/token/refresh/",
+    );
 
-    // If error is 401 and we haven't retried yet (and it's not an auth endpoint)
     if (
       error.response?.status === 401 &&
       !originalRequest._retry &&
-      !isAuthUrl
+      !isRefreshRequest
     ) {
       if (isRefreshing) {
-        // Queue this request while refresh is in progress
         return new Promise((resolve, reject) => {
           failedQueue.push({ resolve, reject });
         })
@@ -46,15 +58,17 @@ api.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        // Call your Django refresh endpoint
-        await api.post("/api/auth/refresh/");
+        const refreshResponse = await api.post("/api/token/refresh/");
+        const newAccessToken = refreshResponse.data.access;
+        console.log("New access token obtained:", newAccessToken);
+
+        tokenManager.setToken(newAccessToken);
 
         processQueue();
         return api(originalRequest);
       } catch (refreshError) {
         processQueue(refreshError);
 
-        // Redirect to login
         if (typeof window !== "undefined") {
           window.location.href = "/login";
         }

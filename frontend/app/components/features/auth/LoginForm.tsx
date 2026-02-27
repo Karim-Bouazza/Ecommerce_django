@@ -16,7 +16,7 @@ import { useAuth } from "@/app/store/auth/auth.context";
 
 export function LoginForm() {
   const [information, setInformation] = useState({
-    email: "",
+    username: "",
     password: "",
   });
 
@@ -32,7 +32,7 @@ export function LoginForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await login(information.email, information.password);
+      await login(information.username, information.password);
       toast.success("Connexion réussie!");
       router.push("/dashboard");
     } catch (error) {
@@ -47,12 +47,12 @@ export function LoginForm() {
           <FieldGroup>
             <InputAuth
               mode="login"
-              label="Email"
-              name="email"
-              type="email"
-              placeholder="Votre email"
+              label="Nom d'utilisateur"
+              name="username"
+              type="text"
+              placeholder="Votre nom d'utilisateur"
               required={true}
-              value={information.email}
+              value={information.username}
               handleInformationChange={handleInformationChange}
             />
             <Field>

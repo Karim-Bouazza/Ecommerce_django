@@ -1,15 +1,16 @@
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 class AuthService {
-  async Login(email: string, password: string) {
-    const response = await fetch(`${API_BASE_URL}/api/login/`, {
+  async Login(username: string, password: string) {
+    const response = await fetch(`${API_BASE_URL}/users/login/`, {
       method: "POST",
+      credentials: "include",
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
       },
       cache: "no-store",
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({ username, password }),
     });
     if (!response.ok) {
       throw new Error("Login failed");
@@ -19,19 +20,25 @@ class AuthService {
   }
 
   async Register(
-    name: string,
+    username: string,
     email: string,
     password: string,
     password_confirmation: string,
   ) {
-    const response = await fetch(`${API_BASE_URL}/api/register/`, {
+    const response = await fetch(`${API_BASE_URL}/users/register/`, {
       method: "POST",
+      credentials: "include",
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
       },
       cache: "no-store",
-      body: JSON.stringify({ name, email, password, password_confirmation }),
+      body: JSON.stringify({
+        username,
+        email,
+        password,
+        password_confirmation,
+      }),
     });
     if (!response.ok) {
       throw Error("Registration failed");
