@@ -28,12 +28,7 @@ function DialogPortal({
 function DialogClose({
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Close>) {
-  return (
-    <DialogPrimitive.Close
-      data-slot="dialog-close"
-      {...props}
-    />
-  );
+  return <DialogPrimitive.Close data-slot="dialog-close" {...props} />;
 }
 
 function DialogOverlay({
@@ -116,7 +111,9 @@ function DialogFooter({
       {children}
       {showCloseButton && (
         <DialogPrimitive.Close asChild>
-          <Button variant="outline">Close</Button>
+          <Button variant="outline">
+            Close
+          </Button>
         </DialogPrimitive.Close>
       )}
     </div>

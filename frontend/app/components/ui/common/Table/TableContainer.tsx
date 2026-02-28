@@ -1,4 +1,3 @@
-
 import TablePagination from "./TablePagination";
 
 export default function TableContainer({
@@ -7,12 +6,14 @@ export default function TableContainer({
   handlePaginationPreviousChange,
   page,
   total,
+  pageSize = 10,
 }: {
   children: React.ReactNode;
   handlePaginationNextChange: () => void;
   handlePaginationPreviousChange: () => void;
   page: number;
   total: number;
+  pageSize?: number;
 }) {
   return (
     <div className="w-full px-5 pb-10 pt-2">
@@ -23,7 +24,7 @@ export default function TableContainer({
           onNext={handlePaginationNextChange}
           onPrevious={handlePaginationPreviousChange}
           currentPage={page}
-          totalPages={Math.ceil(total / 10)}
+          totalPages={Math.ceil(total / pageSize)}
         />
       </div>
     </div>

@@ -1,26 +1,25 @@
 from pathlib import Path
 from datetime import timedelta
+from decouple import config, Csv
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
-
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-ds_b85hhi2i*yr)=m#2f$-6e1uzc7-2xz@i6i5^)%sas3xna#f"
+SECRET_KEY = config("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config("DEBUG", default=False, cast=bool)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="", cast=Csv())
 
 
 # Application definition
 
 INSTALLED_APPS = [
+    "daphne",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -65,20 +64,17 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = "config.wsgi.application"
+ASGI_APPLICATION = "config.asgi.application"
 
-
-# Database
-# https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "db_ecom",
-        "USER": "postgres",
-        "PASSWORD": "fdf6hZGK",
-        "HOST": "127.0.0.1",
-        "PORT": "5432",
+        "NAME": config("POSTGRES_DB"),
+        "USER": config("POSTGRES_USER"),
+        "PASSWORD": config("POSTGRES_PASSWORD"),
+        "HOST": config("POSTGRES_HOST", default="127.0.0.1"),
+        "PORT": config("POSTGRES_PORT", default="5432"),
     }
 }
 
@@ -140,24 +136,15 @@ SIMPLE_JWT = {
     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
 }
 
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
-]
+CORS_ALLOWED_ORIGINS = config(
+    "CORS_ALLOWED_ORIGINS", default="http://localhost:3000", cast=Csv()
+)
 
-CSRF_TRUSTED_ORIGINS = [
-    "http://localhost:3000",
-]
+CSRF_TRUSTED_ORIGINS = CORS_ALLOWED_ORIGINS.copy()
 
 CORS_ALLOW_CREDENTIALS = True
-ASGI_APPLICATION = "config.asgi.application"
 
 CHANNEL_LAYERS = {
-    # "default": {
-    #     "BACKEND": "channels_redis.core.RedisChannelLayer",
-    #     "CONFIG": {
-    #         "hosts": [("127.0.0.1", 6379)],
-    #     },
-    # }
     "default": {
         "BACKEND": "channels.layers.InMemoryChannelLayer",
     },

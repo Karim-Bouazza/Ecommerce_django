@@ -20,7 +20,7 @@ export default function TableHeaderComponent({
         {columns.map((column) => (
           <TableHead
             key={column.id}
-            className={`${column.id === "actions" ? "text-center" : ""}`}
+            className={column.id.startsWith("action") ? "text-center" : ""}
           >
             {column.name}
           </TableHead>

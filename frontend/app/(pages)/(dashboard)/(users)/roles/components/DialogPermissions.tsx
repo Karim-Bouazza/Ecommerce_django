@@ -11,6 +11,17 @@ import {
   CommandItem,
 } from "@/components/ui/command";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
+import type { Permission } from "../types";
+
+interface DialogPermissionsProps {
+  open: boolean;
+  setOpen: (open: boolean) => void;
+  selected: number[];
+  setSelected: React.Dispatch<React.SetStateAction<number[]>>;
+  handleSubmit: () => void;
+  isPending?: boolean;
+  data: Permission[] | undefined;
+}
 
 export default function DialogPermissions({
   open,
@@ -18,50 +29,47 @@ export default function DialogPermissions({
   selected,
   setSelected,
   handleSubmit,
+  isPending,
   data,
-}: {
-  open: boolean;
-  setOpen: (open: boolean) => void;
-  selected: number[];
-  setSelected: (selected: number[]) => void;
-  handleSubmit?: () => void;
-  data: any;
-}) {
-  const toggleRole = (permissionsId: number) => {
-    // @ts-ignore
-    setSelected((prev) => {
-      if (prev.includes(permissionsId)) {
-        return prev.filter((id: any) => id !== permissionsId);
-      } else {
-        return [...prev, permissionsId];
-      }
-    });
+}: DialogPermissionsProps) {
+  const togglePermission = (permissionId: number) => {
+    setSelected((prev) =>
+      prev.includes(permissionId)
+        ? prev.filter((id) => id !== permissionId)
+        : [...prev, permissionId],
+    );
   };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent>
         <Command>
-          <CommandInput placeholder="Search Permissions..." />
+          <CommandInput placeholder="Rechercher des permissions..." />
           <CommandList>
-            <CommandEmpty>No permissions found.</CommandEmpty>
+            <CommandEmpty>Aucune permission trouvée.</CommandEmpty>
 
-            <CommandGroup heading={`Permissions (${data?.length || 0})`}>
-              {data?.map((d: any) => (
+            <CommandGroup heading={`Permissions (${data?.length ?? 0})`}>
+              {data?.map((permission) => (
                 <CommandItem
-                  key={d.id}
-                  onSelect={() => toggleRole(d.id)}
-                  className="flex items-center gap-2"
+                  key={permission.id}
+                  onSelect={() => togglePermission(permission.id)}
+                  className="flex items-center gap-2 cursor-pointer"
                 >
-                  <Checkbox checked={selected.includes(d.id)} />
-                  {d.name}
+                  <Checkbox checked={selected.includes(permission.id)} />
+                  {permission.name}
                 </CommandItem>
               ))}
             </CommandGroup>
           </CommandList>
         </Command>
 
-        <Button onClick={handleSubmit} className="cursor-pointer" >Save</Button>
+        <Button
+          onClick={handleSubmit}
+          disabled={isPending}
+          className="cursor-pointer"
+        >
+          {isPending ? "Enregistrement..." : "Enregistrer"}
+        </Button>
       </DialogContent>
     </Dialog>
   );

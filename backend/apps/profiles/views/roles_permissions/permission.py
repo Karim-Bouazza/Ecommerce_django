@@ -5,5 +5,5 @@ from django.contrib.auth.models import Permission
 
 class PermissionView(ListAPIView):
     pagination_class = None
-    queryset = Permission.objects.all()
+    queryset = Permission.objects.all().order_by("id")
     serializer_class = PermissionSerializer

@@ -34,7 +34,7 @@ export default function Users() {
   // };
 
   const handleUsers = () => {
-    console.log("users....: ");
+    console.log("users....: ", data);
   };
 
   const columnsTitle = [
@@ -45,7 +45,7 @@ export default function Users() {
     { name: "Edit", id: "actions" },
   ];
 
-  const users = data || [];
+  const users = data?.results || [];
   return (
     <>
       <div>

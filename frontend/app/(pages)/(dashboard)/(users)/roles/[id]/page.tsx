@@ -1,93 +1,69 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
+import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import useRole from "../hooks/core/useRole";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
 import TableContainer from "@/app/components/ui/common/Table/TableContainer";
 import TableHeaderPage from "@/app/components/ui/common/Table/TableHeaderPage";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import TableHeaderComponent from "@/app/components/ui/common/Table/TableHeader";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import api from "@/app/lib/api-client";
-import { useEffect, useState } from "react";
+import useRole from "../hooks/core/useRole";
+import usePermissions from "../hooks/core/usePermissions";
+import useUpdatePermissions from "../hooks/core/useUpdatePermissions";
 import DialogPermissions from "../components/DialogPermissions";
+import { permissionsColumns } from "../data";
+import type { Permission } from "../types";
 
 export default function RoleDetailsPage() {
-  const { data: permissionsData } = useQuery({
-    queryKey: ["permissions"],
-    queryFn: async () => {
-      const data = await api.get("/users/permissions");
-      return data.data;
-    },
-  });
+  const params = useParams();
+  const id = params.id as string;
 
-  const queryClient = useQueryClient();
-  const updatePermissionsMutation = useMutation({
-    mutationFn: async (permissions_ids: number[]) => {
-      const response = await api.patch(`/users/roles-permissions/${id}/`, {
-        permissions_ids,
-      });
-      return response.data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["permissions", id] });
-      setOpen(false);
-    },
-    onError: (error) => {
-      console.error("Update failed:", error);
-    },
-  });
+  const { data: role } = useRole(id);
+  const { data: allPermissions } = usePermissions();
+  const updatePermissions = useUpdatePermissions(id);
 
   const [open, setOpen] = useState(false);
   const [selected, setSelected] = useState<number[]>([]);
 
-  const params = useParams();
-  const id = params.id as string;
-  const { data } = useRole(id);
-  const permissions = data?.permissions || [];
-
-  const handlePrevious = () => {
-    console.log("Previous page");
-  };
-  const handleNext = () => {
-    console.log("Next page");
-  };
-  const page = 1;
-  const total = 100;
-
-  const columnsTitle = [
-    { name: "ID", id: "id" },
-    { name: "Permissions", id: "name" },
-  ];
-
-  const handleSubmit = () => {
-    console.log("Selected permissions:", selected);
-    updatePermissionsMutation.mutate(selected);
-  };
+  const permissions = role?.permissions ?? [];
 
   useEffect(() => {
     if (open && permissions.length > 0) {
-      setSelected(permissions.map((p: any) => p.id));
+      setSelected(permissions.map((p: Permission) => p.id));
     }
   }, [open, permissions]);
 
+  const handleSubmit = () => {
+    updatePermissions.mutate(selected, {
+      onSuccess: () => {
+        setOpen(false);
+        toast.success("Permissions mises à jour avec succès");
+      },
+      onError: () => {
+        toast.error("Erreur lors de la mise à jour des permissions");
+      },
+    });
+  };
+
+  const roleName = role?.name
+    ? role.name.charAt(0).toUpperCase() + role.name.slice(1)
+    : "";
+
   return (
     <>
-      <div></div>
       <TableContainer
-        handlePaginationPreviousChange={handlePrevious}
-        handlePaginationNextChange={handleNext}
-        page={page}
-        total={total}
+        handlePaginationPreviousChange={() => {}}
+        handlePaginationNextChange={() => {}}
+        page={1}
+        total={permissions.length}
+        pageSize={permissions.length || 1}
       >
-        <TableHeaderPage
-          title={`${data?.name?.charAt(0).toUpperCase()}${data?.name?.slice(1)}`}
-        >
+        <TableHeaderPage title={roleName}>
           <Button
             size="sm"
             className="cursor-pointer"
             onClick={() => setOpen(true)}
-            // onClick={handlepemrmssions}
           >
             Ajouter permissions
           </Button>
@@ -95,16 +71,13 @@ export default function RoleDetailsPage() {
 
         <div className="overflow-x-auto w-full rounded-xl">
           <Table className="w-full">
-            <TableHeaderComponent columns={columnsTitle} />
+            <TableHeaderComponent columns={permissionsColumns} />
 
             <TableBody>
-              {permissions.map((role: any, index: any) => (
-                <TableRow key={(role as any).id ?? index} className="h-12">
-                  <TableCell className="text-left">
-                    {(page - 1) * 10 + index + 1}
-                  </TableCell>
-
-                  <TableCell>{role.name}</TableCell>
+              {permissions.map((permission: Permission, index: number) => (
+                <TableRow key={permission.id} className="h-12">
+                  <TableCell className="text-left">{index + 1}</TableCell>
+                  <TableCell>{permission.name}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -118,7 +91,8 @@ export default function RoleDetailsPage() {
         selected={selected}
         setSelected={setSelected}
         handleSubmit={handleSubmit}
-        data={permissionsData}
+        isPending={updatePermissions.isPending}
+        data={allPermissions}
       />
     </>
   );

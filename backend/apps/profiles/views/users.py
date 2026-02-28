@@ -8,7 +8,10 @@ User = get_user_model()
 
 class UserView(ListAPIView):
     permission_classes = [IsAuthenticated]
-    queryset = User.objects.exclude(groups__name="client").prefetch_related("groups").only(
-        "id", "username", "first_name", "last_name", "phone"
+    queryset = (
+        User.objects.exclude(groups__name="client")
+        .prefetch_related("groups")
+        .only("id", "username", "first_name", "last_name", "phone")
+        .order_by("id")
     )
     serializer_class = UserSerializer
